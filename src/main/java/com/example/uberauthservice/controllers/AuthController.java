@@ -19,7 +19,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping("/signup")
+    @PostMapping("/signup/passenger")
     public ResponseEntity<PassengerDTO> signup(@RequestBody PassengerSignupRequestDTO dto) {
         PassengerDTO passengerDTO = authService.signup(dto);
         return new ResponseEntity<>(passengerDTO, HttpStatus.CREATED);
