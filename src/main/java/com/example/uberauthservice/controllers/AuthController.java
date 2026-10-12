@@ -24,4 +24,8 @@ public class AuthController {
         PassengerDTO passengerDTO = authService.signup(dto);
         return new ResponseEntity<>(passengerDTO, HttpStatus.CREATED);
     }
+
+    public ResponseEntity<?> signin() {
+        return new ResponseEntity<>("Login successful", HttpStatus.OK);
+    }
 }
