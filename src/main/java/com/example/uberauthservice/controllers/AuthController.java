@@ -1,6 +1,7 @@
 package com.example.uberauthservice.controllers;
 
 import com.example.uberauthservice.dtos.PassengerDTO;
+import com.example.uberauthservice.dtos.PassengerSigninRequestDTO;
 import com.example.uberauthservice.dtos.PassengerSignupRequestDTO;
 import com.example.uberauthservice.services.AuthService;
 import org.springframework.http.HttpStatus;
@@ -25,7 +26,13 @@ public class AuthController {
         return new ResponseEntity<>(passengerDTO, HttpStatus.CREATED);
     }
 
-    public ResponseEntity<?> signin() {
-        return new ResponseEntity<>("Login successful", HttpStatus.OK);
+    @PostMapping("/signin/passenger")
+    public ResponseEntity<?> signin(@RequestBody PassengerSigninRequestDTO dto) {
+        try {
+            PassengerDTO passengerDTO = authService.signin(dto);
+            return new ResponseEntity<>(passengerDTO, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }
