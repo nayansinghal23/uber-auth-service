@@ -47,7 +47,7 @@ public class JWTService {
         );
     }
 
-    public Boolean validateToken(String token, String userId) {
+    public Boolean validateToken(String token, Long userId) {
         try {
             String tokenUserId = Jwts.parser()
                     .verifyWith(getSigningKey())
@@ -56,7 +56,7 @@ public class JWTService {
                     .getPayload()
                     .getSubject();
 
-            return tokenUserId.equals(userId) && !isTokenExpired(token);
+            return tokenUserId.equals(userId.toString()) && !isTokenExpired(token);
         } catch (Exception e) {
             return false;
         }
