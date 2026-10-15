@@ -1,4 +1,0 @@
-ALTER TABLE passenger
-    ADD COLUMN phone_number VARCHAR(255) NULL,
-    ADD COLUMN email VARCHAR(255) NULL,
-    ADD COLUMN password VARCHAR(255) NULL;
