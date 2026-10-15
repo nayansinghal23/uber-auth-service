@@ -2,6 +2,7 @@ package com.example.uberauthservice.controllers;
 
 import com.example.uberauthservice.dtos.PassengerDTO;
 import com.example.uberauthservice.dtos.PassengerSigninRequestDTO;
+import com.example.uberauthservice.dtos.PassengerSignupRequestDTO;
 import com.example.uberauthservice.services.AuthService;
 import com.example.uberauthservice.services.JWTService;
 import org.junit.jupiter.api.BeforeEach;
