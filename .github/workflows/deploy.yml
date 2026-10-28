@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   build:
-    name: Build and Test Microservices
+    name: Build and Test
     runs-on: ubuntu-latest
 
     steps:
@@ -33,18 +33,66 @@ jobs:
           java-version: '17'
           cache: gradle
 
-      - name: Build and publish Entity Service
+      - name: Build and Publish Entity Service
         working-directory: entity-service
         run: |
           chmod +x gradlew
           ./gradlew clean publishToMavenLocal
 
-      - name: Build and test Auth Service
+      - name: Build and Test Auth Service
         run: |
           chmod +x gradlew
           ./gradlew clean build
 
-      - name: Verify executable JAR
+      - name: Upload Executable JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: uber-auth-jar
+          path: build/libs/UberAuthService-0.0.1-SNAPSHOT.jar
+          if-no-files-found: error
+
+  deploy:
+    name: Deploy to EC2
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Executable JAR
+        uses: actions/download-artifact@v4
+        with:
+          name: uber-auth-jar
+          path: deploy
+
+      - name: Configure SSH
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
-          test -f build/libs/UberAuthService-0.0.1-SNAPSHOT.jar
-          jar tf build/libs/UberAuthService-0.0.1-SNAPSHOT.jar | grep -q 'BOOT-INF/'
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$EC2_SSH_KEY" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+
+          ssh-keyscan -H "$EC2_HOST" >> ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/known_hosts
+
+      - name: Upload JAR to EC2
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          scp -i ~/.ssh/deploy_key \
+            -o IdentitiesOnly=yes \
+            deploy/UberAuthService-0.0.1-SNAPSHOT.jar \
+            "$EC2_USER@$EC2_HOST:/tmp/uber-auth-app.jar"
+
+      - name: Deploy and Restart Service
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+            -o IdentitiesOnly=yes \
+            "$EC2_USER@$EC2_HOST" \
+            'sudo /usr/local/sbin/deploy-uber-auth.sh'
