@@ -6,6 +6,8 @@ import com.example.uberentityservice.enums.DriverApprovalStatus;
 import com.example.uberentityservice.models.Driver;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 public class DriverAuthService {
     private final DriverRepository driverRepository;
@@ -24,5 +26,9 @@ public class DriverAuthService {
                 .driverApprovalStatus(DriverApprovalStatus.APPROVED) // TODO : PENDING approval status and a CRON job to convert it to APPROVED.
                 .build()
         );
+    }
+
+    public Optional<Driver> login(String licenseNumber) {
+        return driverRepository.findByLicenseNumber(licenseNumber);
     }
 }
