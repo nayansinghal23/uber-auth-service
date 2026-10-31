@@ -1,5 +1,6 @@
 package com.example.uberauthservice.controllers;
 
+import com.example.uberauthservice.dtos.DriverSigninRequestDTO;
 import com.example.uberauthservice.dtos.DriverSignupRequestDTO;
 import com.example.uberauthservice.dtos.DriverSignupResponseDTO;
 import com.example.uberauthservice.services.DriverAuthService;
@@ -10,8 +11,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/auth/driver")
@@ -51,28 +50,14 @@ public class DriverAuthController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<DriverSignupResponseDTO> login(@RequestBody String licenseNumber) {
-        DriverSignupResponseDTO responseDTO = new DriverSignupResponseDTO();
-        try {
-            Optional<Driver> driver = driverAuthService.login(licenseNumber);
-            if (driver.isEmpty()) {
-                responseDTO.setMessage("Unable to find driver with entered license number");
-                return new ResponseEntity<>(responseDTO, HttpStatus.BAD_REQUEST);
-            }
-
-            responseDTO.setDriver(driver.get());
-            responseDTO.setMessage("Driver logged in successfully");
-
-            String token = jwtService.createToken(driver.get().getId(), driver.get().getLicenseNumber());
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("Authorization", "Bearer " + token);
-
-            return ResponseEntity.ok().headers(headers).body(responseDTO);
-        } catch (Exception e) {
-            responseDTO.setDriver(null);
-            responseDTO.setMessage(e.getMessage());
-            return new ResponseEntity<>(responseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    public ResponseEntity<DriverSignupResponseDTO> login(@RequestBody DriverSigninRequestDTO dto) {
+        DriverSignupResponseDTO responseDTO = driverAuthService.login(dto.getLicenseNumber());
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + responseDTO.getAccessToken());
+        return ResponseEntity
+                .status(responseDTO.getDriver() == null ? HttpStatus.BAD_REQUEST : HttpStatus.OK)
+                .headers(headers)
+                .body(responseDTO);
     }
 
     @PostMapping("/validate/{userId}")
