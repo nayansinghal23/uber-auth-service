@@ -1,7 +1,7 @@
 package com.example.uberauthservice.controllers;
 
 import com.example.uberauthservice.dtos.PassengerDTO;
-import com.example.uberauthservice.dtos.PassengerRefreshDTO;
+import com.example.uberauthservice.dtos.RefreshDTO;
 import com.example.uberauthservice.dtos.PassengerSigninRequestDTO;
 import com.example.uberauthservice.dtos.PassengerSignupRequestDTO;
 import com.example.uberauthservice.services.JWTService;
@@ -64,9 +64,9 @@ public class PassengerAuthController {
     }
 
     @PostMapping("/refresh")
-    public ResponseEntity<String> refresh(@RequestBody PassengerRefreshDTO dto) {
+    public ResponseEntity<String> refresh(@RequestBody RefreshDTO dto) {
         try {
-            String accessToken = passengerAuthService.refresh(dto.getPassengerId(), dto.getRefreshToken());
+            String accessToken = passengerAuthService.refresh(dto.getUserId(), dto.getRefreshToken());
             HttpHeaders headers = new HttpHeaders();
             headers.set("Authorization", "Bearer " + accessToken);
             return ResponseEntity

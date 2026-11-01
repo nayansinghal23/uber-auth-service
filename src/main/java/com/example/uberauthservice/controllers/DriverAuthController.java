@@ -3,6 +3,7 @@ package com.example.uberauthservice.controllers;
 import com.example.uberauthservice.dtos.DriverSigninRequestDTO;
 import com.example.uberauthservice.dtos.DriverSignupRequestDTO;
 import com.example.uberauthservice.dtos.DriverSignupResponseDTO;
+import com.example.uberauthservice.dtos.RefreshDTO;
 import com.example.uberauthservice.services.DriverAuthService;
 import com.example.uberauthservice.services.JWTService;
 import com.example.uberentityservice.models.Driver;
@@ -72,6 +73,21 @@ public class DriverAuthController {
             return new ResponseEntity<>(isTokenValid, isTokenValid ? HttpStatus.OK : HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
             return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<String> refresh(@RequestBody RefreshDTO dto) {
+        try {
+            String accessToken = driverAuthService.refresh(dto.getUserId(), dto.getRefreshToken());
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + accessToken);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .headers(headers)
+                    .body(accessToken);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

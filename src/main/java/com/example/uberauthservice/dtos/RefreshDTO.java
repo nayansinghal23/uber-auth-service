@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PassengerRefreshDTO {
-    private Long passengerId;
+public class RefreshDTO {
+    private Long userId;
     private String refreshToken;
 }
