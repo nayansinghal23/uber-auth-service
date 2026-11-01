@@ -1,6 +1,7 @@
 package com.example.uberauthservice.controllers;
 
 import com.example.uberauthservice.dtos.PassengerDTO;
+import com.example.uberauthservice.dtos.PassengerRefreshDTO;
 import com.example.uberauthservice.dtos.PassengerSigninRequestDTO;
 import com.example.uberauthservice.dtos.PassengerSignupRequestDTO;
 import com.example.uberauthservice.services.JWTService;
@@ -59,6 +60,21 @@ public class PassengerAuthController {
             return new ResponseEntity<>(isTokenValid, isTokenValid ? HttpStatus.OK : HttpStatus.UNAUTHORIZED);
         } catch (Exception e) {
             return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<String> refresh(@RequestBody PassengerRefreshDTO dto) {
+        try {
+            String accessToken = passengerAuthService.refresh(dto.getPassengerId(), dto.getRefreshToken());
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Bearer " + accessToken);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .headers(headers)
+                    .body(accessToken);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }

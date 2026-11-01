@@ -65,4 +65,39 @@ public class PassengerAuthService {
         refreshTokenRepository.save(refreshToken);
         return PassengerDTO.from(passenger.get(), accessToken, refreshToken.getTokenHash());
     }
+
+    public String refresh(Long passengerId, String refreshToken) {
+        Optional<Passenger> passenger = passengerRepository.findById(passengerId);
+        if (passenger.isEmpty()) throw new UsernameNotFoundException("Invalid passenger id : " + passengerId);
+
+        Optional<RefreshToken> storedToken = refreshTokenRepository.findById(passengerId);
+        if (storedToken.isEmpty()) {
+            throw new BadCredentialsException("Invalid refresh token");
+        }
+
+        RefreshToken token = storedToken.get();
+
+        // Validate token ownership/type
+        if (!token.getUserType().equals(UserType.RIDER)) {
+            throw new BadCredentialsException("Invalid refresh token");
+        }
+
+        // Reject revoked tokens
+        if (token.isRevoked()) {
+            throw new BadCredentialsException("Refresh token has been revoked");
+        }
+
+        // Validate token value
+        if (!token.getTokenHash().equals(refreshToken)) {
+            throw new BadCredentialsException("Invalid refresh token");
+        }
+
+        // Validate token expiry
+        if (!token.getExpiresAt().isAfter(Instant.now())) {
+            throw new BadCredentialsException("Refresh token has expired");
+        }
+
+        // Generate a new access token using your existing JWT service
+        return jwtService.createToken(passengerId, passenger.get().getEmail());
+    }
 }
