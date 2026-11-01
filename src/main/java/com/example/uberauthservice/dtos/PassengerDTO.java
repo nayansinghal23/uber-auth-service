@@ -14,20 +14,22 @@ import java.util.Date;
 public class PassengerDTO {
     private String name;
     private String email;
-    private String password;
     private Long userId;
     private String phoneNumber;
     private Date createdAt;
+    private String accessToken;
+    private String refreshToken;
 
-    public static PassengerDTO from(Passenger p) {
+    public static PassengerDTO from(Passenger p, String accessToken, String refreshToken) {
         return PassengerDTO
                 .builder()
                 .userId(p.getId())
                 .createdAt(p.getCreatedAt())
                 .email(p.getEmail())
                 .name(p.getName())
-                .password(p.getPassword())
                 .phoneNumber(p.getPhoneNumber())
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .build();
     }
 }

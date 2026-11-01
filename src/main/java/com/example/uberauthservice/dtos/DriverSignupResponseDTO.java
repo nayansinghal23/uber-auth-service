@@ -11,4 +11,6 @@ import lombok.*;
 public class DriverSignupResponseDTO {
     private Driver driver;
     private String message;
+    private String accessToken;
+    private String refreshToken;
 }
