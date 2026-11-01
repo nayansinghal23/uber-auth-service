@@ -70,7 +70,7 @@ public class PassengerAuthService {
         Optional<Passenger> passenger = passengerRepository.findById(passengerId);
         if (passenger.isEmpty()) throw new UsernameNotFoundException("Invalid passenger id : " + passengerId);
 
-        Optional<RefreshToken> storedToken = refreshTokenRepository.findById(passengerId);
+        Optional<RefreshToken> storedToken = refreshTokenRepository.findByUserId(passengerId);
         if (storedToken.isEmpty()) {
             throw new BadCredentialsException("Invalid refresh token");
         }
@@ -99,5 +99,9 @@ public class PassengerAuthService {
 
         // Generate a new access token using your existing JWT service
         return jwtService.createToken(passengerId, passenger.get().getEmail());
+    }
+
+    public void logout(Long passengerId) {
+        refreshTokenRepository.deleteByUserId(passengerId);
     }
 }

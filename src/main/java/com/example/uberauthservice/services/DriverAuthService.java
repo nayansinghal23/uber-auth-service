@@ -77,7 +77,7 @@ public class DriverAuthService {
         Optional<Driver> driver = driverRepository.findById(driverId);
         if (driver.isEmpty()) throw new UsernameNotFoundException("Invalid passenger id : " + driverId);
 
-        Optional<RefreshToken> storedToken = refreshTokenRepository.findById(driverId);
+        Optional<RefreshToken> storedToken = refreshTokenRepository.findByUserId(driverId);
         if (storedToken.isEmpty()) {
             throw new BadCredentialsException("Invalid refresh token");
         }
@@ -106,5 +106,9 @@ public class DriverAuthService {
 
         // Generate a new access token using your existing JWT service
         return jwtService.createToken(driverId, driver.get().getLicenseNumber());
+    }
+
+    public void logout(Long driverId) {
+        refreshTokenRepository.deleteByUserId(driverId);
     }
 }

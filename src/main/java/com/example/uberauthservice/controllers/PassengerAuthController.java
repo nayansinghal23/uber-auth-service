@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -75,6 +76,17 @@ public class PassengerAuthController {
                     .body(accessToken);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    @PostMapping("/{passengerId}/logout")
+    public ResponseEntity<Boolean> logout(@PathVariable Long passengerId) {
+        try {
+            passengerAuthService.logout(passengerId);
+            SecurityContextHolder.clearContext();
+            return  ResponseEntity.status(HttpStatus.OK).body(true);
+        } catch (Exception e) {
+            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 }
