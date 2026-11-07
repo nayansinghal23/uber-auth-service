@@ -12,6 +12,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -103,5 +104,14 @@ public class PassengerAuthService {
 
     public void logout(Long passengerId) {
         refreshTokenRepository.deleteByUserId(passengerId);
+    }
+
+    @Transactional
+    public int updateProfileImage(Long driverId, String s3ObjectKey) {
+        return passengerRepository.updatePassengerImage(driverId, s3ObjectKey);
+    }
+
+    public Optional<Passenger> getPassengerDetails(Long passengerId) {
+        return passengerRepository.findById(passengerId);
     }
 }

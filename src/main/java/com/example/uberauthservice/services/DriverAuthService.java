@@ -7,11 +7,11 @@ import com.example.uberauthservice.repositories.RefreshTokenRepository;
 import com.example.uberentityservice.enums.DriverApprovalStatus;
 import com.example.uberentityservice.enums.UserType;
 import com.example.uberentityservice.models.Driver;
-import com.example.uberentityservice.models.Passenger;
 import com.example.uberentityservice.models.RefreshToken;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Optional;
@@ -110,5 +110,14 @@ public class DriverAuthService {
 
     public void logout(Long driverId) {
         refreshTokenRepository.deleteByUserId(driverId);
+    }
+
+    @Transactional
+    public int updateProfileImage(Long driverId, String s3ObjectKey) {
+        return driverRepository.updateDriverImage(driverId, s3ObjectKey);
+    }
+
+    public Optional<Driver> getDriverDetails(Long driverId) {
+        return driverRepository.findById(driverId);
     }
 }
