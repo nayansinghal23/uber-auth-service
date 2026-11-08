@@ -39,6 +39,13 @@ jobs:
           chmod +x gradlew
           ./gradlew clean publishToMavenLocal
 
+      - name: Check S3 environment variables
+        run: |
+          test -n "$AWS_ACCESS_KEY_ID" && echo "AWS_ACCESS_KEY_ID is set" || echo "AWS_ACCESS_KEY_ID missing"
+          test -n "$AWS_SECRET_ACCESS_KEY" && echo "AWS_SECRET_ACCESS_KEY is set" || echo "AWS_SECRET_ACCESS_KEY missing"
+          test -n "$AWS_REGION" && echo "AWS_REGION is set" || echo "AWS_REGION missing"
+          test -n "$AWS_S3_BUCKET" && echo "AWS_S3_BUCKET is set" || echo "AWS_S3_BUCKET missing"
+
       - name: Build and Test Auth Service
         run: |
           chmod +x gradlew
